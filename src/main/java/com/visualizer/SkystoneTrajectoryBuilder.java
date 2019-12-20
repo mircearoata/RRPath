@@ -48,14 +48,45 @@ public class SkystoneTrajectoryBuilder extends PublicTrajectoryBuilder {
                 .actualSetReversed(previousReversed);
     }
 
-    public SkystoneTrajectoryBuilder park() {
+    public SkystoneTrajectoryBuilder bridgeSafeUp() {
+        if (currentPose.getHeading() == 0 || currentPose.getHeading() == Math.PI || currentPose.getHeading() == -Math.PI)
+            return actualStrafeTo(new Vector2d(Math.max(currentPose.getX() - 10, 20), -36.0));
+        if (currentPose.getHeading() < -Math.PI / 2)
+            return actualSplineTo(new Pose2d(Math.max(currentPose.getX() - 10, 20), -36.0, -Math.PI));
+        if (currentPose.getHeading() > Math.PI / 2)
+            return actualSplineTo(new Pose2d(Math.max(currentPose.getX() - 10, 20), -36.0, -Math.PI));
+        return actualSplineTo(new Pose2d(Math.max(currentPose.getX() - 10, 20), -36.0, 0));
+    }
+
+    public SkystoneTrajectoryBuilder bridgeSafeDown() {
+        if (currentPose.getHeading() == 0 || currentPose.getHeading() == Math.PI || currentPose.getHeading() == -Math.PI)
+            return actualStrafeTo(new Vector2d(Math.min(currentPose.getX() + 10, -20), -36.0));
+        if (currentPose.getHeading() < -Math.PI / 2)
+            return actualSplineTo(new Pose2d(Math.min(currentPose.getX() + 10, -20), -36.0, -Math.PI));
+        if (currentPose.getHeading() > Math.PI / 2)
+            return actualSplineTo(new Pose2d(Math.min(currentPose.getX() + 10, -20), -36.0, -Math.PI));
+        return actualSplineTo(new Pose2d(Math.min(currentPose.getX() + 10, -20), -36.0, 0));
+    }
+
+
+
+    public SkystoneTrajectoryBuilder bridgeSafe() {
         if(currentPose.getX() > 0)
-            return actualStrafeTo(new Vector2d(currentPose.getX() - 10, -36.0))
-                    .actualStrafeTo(new Vector2d(0, -36.0));
-        else if(currentPose.getX() < 0)
-            return actualStrafeTo(new Vector2d(currentPose.getX() + 10, -36.0))
-                    .actualStrafeTo(new Vector2d(0, -36.0));
+            return bridgeSafeUp();
+        if(currentPose.getX() < 0)
+            return bridgeSafeDown();
         return actualStrafeTo(new Vector2d(0, -36.0));
+    }
+
+    public SkystoneTrajectoryBuilder passBridge() {
+        if(currentPose.getX() > 0)
+            return bridgeSafe().bridgeSafeDown();
+        return bridgeSafe().bridgeSafeUp();
+    }
+
+    public SkystoneTrajectoryBuilder park() {
+        return bridgeSafe()
+                .actualStrafeTo(new Vector2d(0, -36.0));
     }
 
     public SkystoneTrajectoryBuilder actualSetReversed(boolean reversed) {
