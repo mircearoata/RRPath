@@ -19,10 +19,11 @@ public class AutoTrajectoryGenerator {
     );
 
     private TrajectoryUtils.Alliance alliance;
+    private Pose2d startPose;
 
     public AutoTrajectoryGenerator(TrajectoryUtils.Alliance alliance, Pose2d start) {
         this.alliance = alliance;
-        SkystoneTrajectoryBuilder.reset(start);
+        startPose = start;
     }
 
     public enum SkystonePattern {
@@ -35,7 +36,22 @@ public class AutoTrajectoryGenerator {
         return alliance;
     }
 
-    private List<Trajectory> trajectories = new ArrayList<>();
+    public List<Trajectory> getTrajectoriesMoveFoundation() {
+        SkystoneTrajectoryBuilder.reset(startPose);
+        List<Trajectory> trajectories = new ArrayList<>();
+
+        trajectories.add(makeTrajectoryBuilder()
+                .toFoundation()
+                .build());
+        trajectories.add(makeTrajectoryBuilder()
+                .moveFoundation()
+                .build());
+        trajectories.add(makeTrajectoryBuilder()
+                .park()
+                .build());
+
+        return trajectories;
+    }
 
     public List<Trajectory> getTrajectories1Stone(SkystonePattern skystonePattern) {
         int firstSkystone;
@@ -47,7 +63,8 @@ public class AutoTrajectoryGenerator {
             firstSkystone = 2;
         }
 
-        trajectories.clear();
+        SkystoneTrajectoryBuilder.reset(startPose);
+        List<Trajectory> trajectories = new ArrayList<>();
 
         trajectories.add(makeTrajectoryBuilder(Speed.SLOW)
                 .getStone(firstSkystone)
@@ -55,13 +72,10 @@ public class AutoTrajectoryGenerator {
         trajectories.add(makeTrajectoryBuilder()
                 .actualSetReversed(true)
                 .passBridge()
-                .actualSplineTo(new Pose2d(41.5, -37.0, Math.toRadians(270.0)))
-                .actualStrafeTo(new Vector2d(41.5, -29.0))
+                .toFoundation()
                 .build());
         trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(false)
-                .actualSplineTo(new Pose2d(24.0, -48.0, Math.toRadians(180.0)))
-                .actualStrafeTo(new Vector2d(45.0, -48.0))
+                .moveFoundation()
                 .build());
         trajectories.add(makeTrajectoryBuilder()
                 .actualSetReversed(false)
@@ -85,7 +99,8 @@ public class AutoTrajectoryGenerator {
             secondSkystone = 2;
         }
 
-        trajectories.clear();
+        SkystoneTrajectoryBuilder.reset(startPose);
+        List<Trajectory> trajectories = new ArrayList<>();
 
         trajectories.add(makeTrajectoryBuilder(Speed.SLOW)
                 .getStone(firstSkystone)
@@ -93,14 +108,10 @@ public class AutoTrajectoryGenerator {
         trajectories.add(makeTrajectoryBuilder()
                 .actualSetReversed(true)
                 .passBridge()
-                .actualStrafeTo(new Vector2d(24.0, -37.0))
-                .actualSplineTo(new Pose2d(41.5, -37.0, Math.toRadians(270.0)))
-                .actualStrafeTo(new Vector2d(41.5, -29.0))
+                .toFoundation()
                 .build());
         trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(false)
-                .actualSplineTo(new Pose2d(24.0, -48.0, Math.toRadians(180.0)))
-                .actualStrafeTo(new Vector2d(45.0, -48.0))
+                .moveFoundation()
                 .build());
 
         trajectories.add(makeTrajectoryBuilder(Speed.SLOW)

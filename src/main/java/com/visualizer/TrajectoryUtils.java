@@ -17,6 +17,9 @@ public class TrajectoryUtils {
     static final double COLLECT_ANGLE = Math.toRadians(145);
     static final double STONE_SPLINE_DISTANCE = INTAKE_CENTER_DISTANCE + 1;
 
+    public static final Pose2d START_POSE_STONES = new Pose2d(-33.0, -63.0, Math.toRadians(90.0));
+    public static final Pose2d START_POSE_FOUNDATION = new Pose2d(33.0, -63.0, Math.toRadians(270.0));
+
     public enum Alliance {
         RED,
         BLUE

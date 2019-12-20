@@ -1,21 +1,17 @@
-import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.visualizer.AutoTrajectoryGenerator
-import com.visualizer.TrajectoryUtils
-import com.visualizer.TrajectoryUtils.flipIfBlue
+import com.visualizer.TrajectoryUtils.Alliance
+import com.visualizer.TrajectoryUtils.START_POSE_FOUNDATION
 
 
 object TrajectoryGen {
-    private var startPose = Pose2d(-33.0, -63.0, 90.0.toRadians)
 
     fun createTrajectory(): ArrayList<Trajectory> {
         val list = ArrayList<Trajectory>()
-        val trajectories = AutoTrajectoryGenerator(TrajectoryUtils.Alliance.BLUE, startPose)
+        val trajectories = AutoTrajectoryGenerator(Alliance.BLUE, START_POSE_FOUNDATION)
 
-        startPose = flipIfBlue(trajectories.alliance, startPose)
-
-        for (traj in trajectories.getTrajectories1Stone(AutoTrajectoryGenerator.SkystonePattern.LEFT)) {
+        for (traj in trajectories.getTrajectoriesMoveFoundation(/*AutoTrajectoryGenerator.SkystonePattern.LEFT*/)) {
             list.add(traj)
         }
 

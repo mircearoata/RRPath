@@ -22,7 +22,7 @@ import javafx.scene.text.Font
 import javafx.stage.Stage
 import javafx.util.Duration
 
-class App(private val TEXT_SIZE: Double = 20.0) : Application() {
+class App(private val TEXT_SIZE: Double = 20.0, private val TEXT_AREA_HEIGHT: Double = 200.0) : Application() {
     private val robotRect = Rectangle(0.0, 0.0, 10.0, 10.0)
     private val startRect = Rectangle(0.0, 0.0, 10.0, 10.0)
     private val endRect = Rectangle(0.0, 0.0, 10.0, 10.0)
@@ -103,10 +103,10 @@ class App(private val TEXT_SIZE: Double = 20.0) : Application() {
 
         stage.title = "PathVisualizer"
         stage.isResizable = true
-        stage.widthProperty().addListener { _, _, newW -> setFieldSize(Math.min(newW.toDouble(), stage.height - 100)) }
-        stage.heightProperty().addListener { _, _, newH -> setFieldSize(Math.min(newH.toDouble() - 100, stage.width)) }
+        stage.widthProperty().addListener { _, _, newW -> setFieldSize(Math.min(newW.toDouble(), stage.height - TEXT_AREA_HEIGHT + 200)) }
+        stage.heightProperty().addListener { _, _, newH -> setFieldSize(Math.min(newH.toDouble() - TEXT_AREA_HEIGHT + 200, stage.width)) }
         stage.width = 700.0
-        stage.height = 800.0
+        stage.height = stage.width + TEXT_AREA_HEIGHT
 
         durationLabel.font = Font("Arial", TEXT_SIZE)
         currentTimeLabel.font = Font("Arial", TEXT_SIZE)

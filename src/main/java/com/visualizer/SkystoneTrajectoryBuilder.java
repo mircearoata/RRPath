@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.path.heading.ConstantInterpolator;
 import com.acmerobotics.roadrunner.path.heading.HeadingInterpolator;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryConstraints;
+import javafx.beans.property.adapter.ReadOnlyJavaBeanObjectPropertyBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import static com.visualizer.TrajectoryUtils.*;
@@ -82,6 +83,22 @@ public class SkystoneTrajectoryBuilder extends PublicTrajectoryBuilder {
         if(currentPose.getX() > 0)
             return bridgeSafe().bridgeSafeDown();
         return bridgeSafe().bridgeSafeUp();
+    }
+
+    public SkystoneTrajectoryBuilder toFoundation() {
+        boolean previousReversed = isReversed;
+        return actualSetReversed(true)
+                .actualSplineTo(new Pose2d(41.5, -37.0, Math.toRadians(270.0)))
+                .actualStrafeTo(new Vector2d(41.5, -29.0))
+                .actualSetReversed(previousReversed);
+    }
+
+    public SkystoneTrajectoryBuilder moveFoundation() {
+        boolean previousReversed = isReversed;
+        return actualSetReversed(false)
+                .actualSplineTo(new Pose2d(24.0, -48.0, Math.toRadians(180.0)))
+                .actualStrafeTo(new Vector2d(45.0, -48.0))
+                .actualSetReversed(previousReversed);
     }
 
     public SkystoneTrajectoryBuilder park() {
