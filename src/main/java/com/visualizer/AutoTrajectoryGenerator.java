@@ -3,18 +3,27 @@ package com.visualizer;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryConstraints;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.visualizer.TrajectoryUtils.*;
+import static com.visualizer.TrajectoryUtils.ROBOT_W;
+
 public class AutoTrajectoryGenerator {
     private static DriveConstraints BASE_CONSTRAINTS = new DriveConstraints(
-            30, 30, 0.0,
+            35, 40, 0.0,
             Math.toRadians(180.0), Math.toRadians(180.0), 0.0
     );
     private static DriveConstraints SLOW_CONSTRAINTS = new DriveConstraints(
-            25, 30, 0.0,
+            20, 20, 0.0,
+            Math.toRadians(180.0), Math.toRadians(180.0), 0.0
+    );
+    private static DriveConstraints FAST_CONSTRAINTS = new DriveConstraints(
+            45, 45, 0.0,
             Math.toRadians(180.0), Math.toRadians(180.0), 0.0
     );
 
@@ -36,117 +45,98 @@ public class AutoTrajectoryGenerator {
         return alliance;
     }
 
-    public List<Trajectory> getTrajectoriesMoveFoundation() {
-        SkystoneTrajectoryBuilder.reset(startPose);
+    public List<Trajectory> getTrajectoriesSideArm2Stones(SkystonePattern skystonePattern) {
         List<Trajectory> trajectories = new ArrayList<>();
-
-        trajectories.add(makeTrajectoryBuilder()
-                .toFoundation()
-                .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .moveFoundation()
-                .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .park()
-                .build());
-
-        return trajectories;
-    }
-
-    public List<Trajectory> getTrajectories1Stone(SkystonePattern skystonePattern) {
-        int firstSkystone;
-        if (skystonePattern == SkystonePattern.LEFT) {
-            firstSkystone = 3;
-        } else if (skystonePattern == SkystonePattern.MIDDLE) {
-            firstSkystone = 4;
+        Pose2d firstStone;
+        if(skystonePattern == SkystonePattern.LEFT) {
+            firstStone = new Pose2d(getStonePosition(0).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+        } else if(skystonePattern == SkystonePattern.MIDDLE) {
+            firstStone = new Pose2d(getStonePosition(1).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         } else {
-            firstSkystone = 2;
+            firstStone = new Pose2d(getStonePosition(2).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         }
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
+                .splineTo(flipIfBlue(firstStone))
+                .build());
 
-        SkystoneTrajectoryBuilder.reset(startPose);
-        List<Trajectory> trajectories = new ArrayList<>();
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL, true)
+                .splineTo(flipIfBlue(new Pose2d(0, -40)))
+                .splineTo(flipIfBlue(new Pose2d(48, -34)))
+                .build());
 
-        trajectories.add(makeTrajectoryBuilder(Speed.SLOW)
-                .getStone(firstSkystone)
+        Pose2d secondStone;
+        if(skystonePattern == SkystonePattern.LEFT) {
+            secondStone = new Pose2d(getStonePosition(3).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+        } else if(skystonePattern == SkystonePattern.MIDDLE) {
+            secondStone = new Pose2d(getStonePosition(4).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+        } else {
+            secondStone = new Pose2d(getStonePosition(5).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+        }
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
+                .splineTo(flipIfBlue(new Pose2d(0, -40, Math.toRadians(180))))
+                .splineTo(flipIfBlue(secondStone))
                 .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(true)
-                .passBridge()
-                .toFoundation()
+
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL, true)
+                .splineTo(flipIfBlue(new Pose2d(0, -40)))
+                .splineTo(flipIfBlue(new Pose2d(48, -34)))
                 .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .moveFoundation()
+
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
+                .splineToSplineHeading(new Pose2d(44, -42, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToSplineHeading(new Pose2d(44, -34, Math.toRadians(-90)), Math.toRadians(-90))
                 .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(false)
-                .park()
+
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
+                .splineToSplineHeading(new Pose2d(38, -50, Math.toRadians(180)), Math.toRadians(180))
+                .splineToConstantHeading(new Pose2d(48, -50, Math.toRadians(180)))
+                .build());
+
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
+                .splineTo(flipIfBlue(new Pose2d(0, -40, Math.toRadians(180))))
                 .build());
 
         return trajectories;
     }
 
-    public List<Trajectory> getTrajectories2Stones(SkystonePattern skystonePattern) {
-        int firstSkystone;
-        int secondSkystone;
-        if (skystonePattern == SkystonePattern.LEFT) {
-            firstSkystone = 3;
-            secondSkystone = 0;
-        } else if (skystonePattern == SkystonePattern.MIDDLE) {
-            firstSkystone = 4;
-            secondSkystone = 1;
-        } else  {
-            firstSkystone = 5;
-            secondSkystone = 2;
+    private TrajectoryBuilder makeTrajectoryBuilder(List<Trajectory> currentTrajectories, Speed speed, boolean reversed) {
+        Pose2d endPose = currentTrajectories.size() == 0 ? startPose : currentTrajectories.get(currentTrajectories.size() - 1).end();
+        if(reversed)
+            endPose = new Pose2d(endPose.getX(), endPose.getY(), endPose.getHeading() - Math.toRadians(180));
+        return new TrajectoryBuilder(endPose, reversed, constraintsFromSpeed(speed));
+    }
+
+    private TrajectoryBuilder makeTrajectoryBuilder(List<Trajectory> currentTrajectories, Speed speed) {
+        return makeTrajectoryBuilder(currentTrajectories, speed, false);
+    }
+
+    private Pose2d flipIfBlue(Pose2d pose2d) {
+        return TrajectoryUtils.flipIfBlue(alliance, pose2d);
+    }
+
+    private Vector2d flipIfBlue(Vector2d vector2d) {
+        return TrajectoryUtils.flipIfBlue(alliance, vector2d);
+    }
+
+    private Pose2d flipIfBluePositive(Pose2d pose2d) {
+        return TrajectoryUtils.flipIfBluePositive(alliance, pose2d);
+    }
+
+    private TrajectoryConstraints constraintsFromSpeed(Speed speed) {
+        switch (speed) {
+            case SLOW:
+                return SLOW_CONSTRAINTS;
+            case NORMAL:
+                return BASE_CONSTRAINTS;
+            case FAST:
+                return FAST_CONSTRAINTS;
         }
-
-        SkystoneTrajectoryBuilder.reset(startPose);
-        List<Trajectory> trajectories = new ArrayList<>();
-
-        trajectories.add(makeTrajectoryBuilder(Speed.SLOW)
-                .getStone(firstSkystone)
-                .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(true)
-                .passBridge()
-                .toFoundation()
-                .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .moveFoundation()
-                .build());
-
-        trajectories.add(makeTrajectoryBuilder(Speed.SLOW)
-                .passBridge()
-                .getStone(secondSkystone)
-                .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(true)
-                .passBridge()
-                .actualStrafeTo(new Vector2d(45.0, -39.0))
-                .build());
-        trajectories.add(makeTrajectoryBuilder()
-                .actualSetReversed(false)
-                .park()
-                .build());
-
-        return trajectories;
+        return BASE_CONSTRAINTS;
     }
 
     private enum Speed {
         SLOW,
-        NORMAL
-    }
-
-    private SkystoneTrajectoryBuilder makeTrajectoryBuilder() {
-        return makeTrajectoryBuilder(Speed.NORMAL);
-    }
-
-    private SkystoneTrajectoryBuilder makeTrajectoryBuilder(Speed speed) {
-        switch (speed) {
-            case SLOW:
-                return new SkystoneTrajectoryBuilder(SLOW_CONSTRAINTS, alliance);
-            case NORMAL:
-            default:
-                return new SkystoneTrajectoryBuilder(BASE_CONSTRAINTS, alliance);
-        }
+        NORMAL,
+        FAST
     }
 }

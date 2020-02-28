@@ -18,7 +18,11 @@ public class TrajectoryUtils {
     static final double STONE_SPLINE_DISTANCE = INTAKE_CENTER_DISTANCE + 1;
 
     public static final Pose2d START_POSE_STONES = new Pose2d(-33.0, -63.0, Math.toRadians(90.0));
+    public static final Pose2d START_POSE_SIDE = new Pose2d(-33.0, -63.0, Math.toRadians(90.0));
     public static final Pose2d START_POSE_FOUNDATION = new Pose2d(33.0, -63.0, Math.toRadians(270.0));
+
+    public static final double BRIDGE_INNER_Y = -33.0;
+    public static final double BRIDGE_OUTER_Y = -62.0;
 
     public enum Alliance {
         RED,
@@ -43,5 +47,9 @@ public class TrajectoryUtils {
             flipped = new Pose2d(flipped.getX(), flipped.getY(), Math.toRadians(180));
         }
         return flipped;
+    }
+
+    public static Vector2d getStonePosition(int stoneNumber) {
+        return new Vector2d(BOTTOM_WALL + stoneNumber * STONE_L + STONE_L / 2, -30);
     }
 }
