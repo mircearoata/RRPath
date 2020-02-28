@@ -22,7 +22,7 @@ import javafx.scene.text.Font
 import javafx.stage.Stage
 import javafx.util.Duration
 
-class App(private val TEXT_SIZE: Double = 20.0, private val TEXT_AREA_HEIGHT: Double = 200.0) : Application() {
+class App(private val TEXT_SIZE: Double = 20.0, private val TEXT_AREA_HEIGHT: Double = 100.0) : Application() {
     private val robotRect = Rectangle(0.0, 0.0, 10.0, 10.0)
     private val startRect = Rectangle(0.0, 0.0, 10.0, 10.0)
     private val endRect = Rectangle(0.0, 0.0, 10.0, 10.0)
@@ -103,8 +103,8 @@ class App(private val TEXT_SIZE: Double = 20.0, private val TEXT_AREA_HEIGHT: Do
 
         stage.title = "PathVisualizer"
         stage.isResizable = true
-        stage.widthProperty().addListener { _, _, newW -> setFieldSize(Math.min(newW.toDouble(), stage.height - TEXT_AREA_HEIGHT + 200)) }
-        stage.heightProperty().addListener { _, _, newH -> setFieldSize(Math.min(newH.toDouble() - TEXT_AREA_HEIGHT + 200, stage.width)) }
+        stage.widthProperty().addListener { _, _, newW -> setFieldSize(Math.min(newW.toDouble(), stage.height - TEXT_AREA_HEIGHT) - 17) }
+        stage.heightProperty().addListener { _, _, newH -> setFieldSize(Math.min(newH.toDouble() - TEXT_AREA_HEIGHT, stage.width) - 17) }
         stage.width = 700.0
         stage.height = stage.width + TEXT_AREA_HEIGHT
 
