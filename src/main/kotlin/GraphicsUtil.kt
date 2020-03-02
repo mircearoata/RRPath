@@ -2,13 +2,16 @@ import com.acmerobotics.roadrunner.geometry.Pose2d
 import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.path.Path
 import javafx.scene.canvas.GraphicsContext
-
 import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import javafx.scene.shape.Rectangle
+import javafx.scene.transform.Affine
+import javafx.scene.transform.Rotate
+import javax.swing.Spring.height
 
 
 object GraphicsUtil {
-    val DEFUALT_RESOLUTION = 2.0 // inches
+    val DEFUALT_RESOLUTION = 2 // inches
 
     val FIELD_WIDTH = 144.0 // 12'
 
@@ -41,6 +44,16 @@ object GraphicsUtil {
         strokePolyline(points)
     }
 
+    fun drawRobotTrail(path: Path) {
+        val samples = Math.ceil(path.length() / DEFUALT_RESOLUTION).toInt() * 75
+        val dx = path.length() / (samples - 1).toDouble()
+        for (i in 0 until samples) {
+            val displacement = i * dx
+            val pose = path[displacement]
+            drawRectangleRotated(pose.vec().toPixel.x - ROBOT_WIDTH * pixelsPerInch / 2, pose.vec().toPixel.y - ROBOT_WIDTH * pixelsPerInch / 2, Math.toDegrees(-pose.heading), ROBOT_WIDTH * pixelsPerInch, ROBOT_WIDTH * pixelsPerInch, Color.GREEN)
+        }
+    }
+
     fun strokePolyline(points: Array<Vector2d>) {
         val pixels = points.map { it.toPixel }
         gc.strokePolyline(pixels.map { it.x }.toDoubleArray(), pixels.map { it.y }.toDoubleArray(), points.size)
@@ -71,6 +84,21 @@ object GraphicsUtil {
         val pix_h = h * pixelsPerInch
 
         gc.fillRect(center_pix.x - pix_w / 2.0, center_pix.y - pix_h / 2.0, pix_w, pix_h)
+    }
+
+    fun drawRectangleRotated(x: Double, y: Double, r: Double, w: Double, h: Double, fill: Paint) {
+        val rotationCenterX: Double = x + (w / 2)
+        val rotationCenterY: Double = y + (h / 2)
+
+        gc.save()
+        gc.translate(rotationCenterX, rotationCenterY);
+        gc.rotate(r);
+        val oldFill = gc.fill
+        gc.fill = fill
+        gc.fillRect(-w / 2, -h / 2, w, h)
+        gc.fill = oldFill
+        gc.translate(-rotationCenterX, -rotationCenterY);
+        gc.restore()
     }
 
     fun updateRobotRect(rectangle: Rectangle, pose2d: Pose2d, color: Color, opacity: Double) {

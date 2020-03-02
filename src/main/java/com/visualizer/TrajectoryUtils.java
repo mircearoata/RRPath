@@ -24,6 +24,10 @@ public class TrajectoryUtils {
     public static final double BRIDGE_INNER_Y = -33.0;
     public static final double BRIDGE_OUTER_Y = -62.0;
 
+    public static double flipIfBlue(Alliance alliance, double angle) {
+        return alliance == Alliance.RED ? angle : -angle;
+    }
+
     public enum Alliance {
         RED,
         BLUE

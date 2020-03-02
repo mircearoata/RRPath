@@ -130,12 +130,22 @@ class App(private val TEXT_SIZE: Double = 20.0, private val TEXT_AREA_HEIGHT: Do
     private var prevTime = Clock.seconds
 
     private var paused = false
+    private var prevPaused = false
 
     private fun run(gc: GraphicsContext) {
         val deltaTime = Clock.seconds - prevTime
         prevTime = Clock.seconds
         if (!paused) {
             runtime += deltaTime
+        } else {
+            if (!prevPaused) {
+                trajectories.forEach { GraphicsUtil.drawRobotTrail(it.path) }
+                trajectories.forEach { GraphicsUtil.drawSampledPath(it.path) }
+            }
+        }
+        prevPaused = paused
+        if(paused) {
+            return
         }
         if (startTime.isNaN())
             startTime = Clock.seconds

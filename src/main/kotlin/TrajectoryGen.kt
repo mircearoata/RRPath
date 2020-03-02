@@ -3,12 +3,18 @@ import com.acmerobotics.roadrunner.geometry.Vector2d
 import com.acmerobotics.roadrunner.trajectory.Trajectory
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints
 import com.visualizer.AutoTrajectoryGenerator
 import com.visualizer.TrajectoryUtils.*
 
 
 object TrajectoryGen {
     val ALLIANCE = Alliance.RED
+
+    private val BASE_CONSTRAINTS = DriveConstraints(
+        35.0, 40.0, 0.0,
+        Math.toRadians(180.0), Math.toRadians(180.0), 0.0
+    )
 
     fun createTrajectory(): ArrayList<Trajectory> {
         val list = ArrayList<Trajectory>()
@@ -18,9 +24,10 @@ object TrajectoryGen {
             list.add(traj)
         }
 
-        /*list.add(TrajectoryBuilder(Pose2d(-50.0,0.0, 0.0.toRadians), DriveConstraints(85.0, 150.0, 0.0, 360.0.toRadians, 0.0.toRadians, 0.0.toRadians))
-            .forward(100.0)
-            .build())*/
+//        list.add(TrajectoryBuilder(Pose2d(0.0,0.0,0.0), 0.0, BASE_CONSTRAINTS)
+//            .splineToConstantHeading(Pose2d(0.0, 10.0, 0.0))
+//            .splineTo(Pose2d(10.0, 10.0, 0.0))
+//            .build())
 
         return list
     }

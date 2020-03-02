@@ -49,55 +49,61 @@ public class AutoTrajectoryGenerator {
         List<Trajectory> trajectories = new ArrayList<>();
         Pose2d firstStone;
         if(skystonePattern == SkystonePattern.LEFT) {
-            firstStone = new Pose2d(getStonePosition(0).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+            firstStone = new Pose2d(getStonePosition(0).minus(new Vector2d(0, STONE_W / 2 + 1)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         } else if(skystonePattern == SkystonePattern.MIDDLE) {
-            firstStone = new Pose2d(getStonePosition(1).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+            firstStone = new Pose2d(getStonePosition(1).minus(new Vector2d(0, STONE_W / 2 + 1)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         } else {
-            firstStone = new Pose2d(getStonePosition(2).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+            firstStone = new Pose2d(getStonePosition(2).minus(new Vector2d(0, STONE_W / 2 + 1)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         }
         trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
-                .splineTo(flipIfBlue(firstStone))
+                .splineTo(flipIfBlue(new Pose2d(firstStone.getX(), firstStone.getY() - 2, firstStone.getHeading())))
+                .splineToConstantHeading(flipIfBlue(firstStone))
                 .build());
 
         trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL, true)
+                .splineToConstantHeading(flipIfBlue(new Pose2d(firstStone.getX(), firstStone.getY() - 2, 0)))
                 .splineTo(flipIfBlue(new Pose2d(0, -40)))
                 .splineTo(flipIfBlue(new Pose2d(48, -34)))
                 .build());
 
         Pose2d secondStone;
         if(skystonePattern == SkystonePattern.LEFT) {
-            secondStone = new Pose2d(getStonePosition(3).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+            secondStone = new Pose2d(getStonePosition(3).minus(new Vector2d(0, STONE_W / 2 + 1)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         } else if(skystonePattern == SkystonePattern.MIDDLE) {
-            secondStone = new Pose2d(getStonePosition(4).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+            secondStone = new Pose2d(getStonePosition(4).minus(new Vector2d(0, STONE_W / 2 + 1)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         } else {
-            secondStone = new Pose2d(getStonePosition(5).minus(new Vector2d(0, STONE_W / 2)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
+            secondStone = new Pose2d(getStonePosition(5).minus(new Vector2d(0, STONE_W / 2 + 1)).plus(new Vector2d(ROBOT_L / 2, 0)), Math.toRadians(180));
         }
         trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
                 .splineTo(flipIfBlue(new Pose2d(0, -40, Math.toRadians(180))))
-                .splineTo(flipIfBlue(secondStone))
+                .splineTo(flipIfBlue(new Pose2d(secondStone.getX(), secondStone.getY() - 2, secondStone.getHeading())))
+                .splineToConstantHeading(flipIfBlue(secondStone))
                 .build());
 
         trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL, true)
+                .splineToConstantHeading(flipIfBlue(new Pose2d(secondStone.getX(), secondStone.getY() - 2, 0)))
                 .splineTo(flipIfBlue(new Pose2d(0, -40)))
                 .splineTo(flipIfBlue(new Pose2d(48, -34)))
                 .build());
 
         trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
-                .splineToSplineHeading(new Pose2d(44, -42, Math.toRadians(-90)), Math.toRadians(-90))
-                .splineToSplineHeading(new Pose2d(44, -34, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToConstantHeading(flipIfBlue(new Pose2d(48, -42, Math.toRadians(-180))))
+                .splineTo(flipIfBlue(new Pose2d(44, -50, Math.toRadians(-90))))
+                .splineToConstantHeading(flipIfBlue(new Pose2d(44, -34, Math.toRadians(-90))))
                 .build());
 
         trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
-                .splineToSplineHeading(new Pose2d(38, -50, Math.toRadians(180)), Math.toRadians(180))
-                .splineToConstantHeading(new Pose2d(48, -50, Math.toRadians(180)))
+                .splineToSplineHeading(flipIfBlue(new Pose2d(38, -50, Math.toRadians(180))), flipIfBlue(Math.toRadians(180)))
+                .splineToConstantHeading(flipIfBlue(new Pose2d(48, -50, Math.toRadians(180))))
                 .build());
 
-        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.NORMAL)
+        trajectories.add(makeTrajectoryBuilder(trajectories, Speed.FAST)
                 .splineTo(flipIfBlue(new Pose2d(0, -40, Math.toRadians(180))))
                 .build());
 
         return trajectories;
     }
+
 
     private TrajectoryBuilder makeTrajectoryBuilder(List<Trajectory> currentTrajectories, Speed speed, boolean reversed) {
         Pose2d endPose = currentTrajectories.size() == 0 ? startPose : currentTrajectories.get(currentTrajectories.size() - 1).end();
@@ -118,6 +124,9 @@ public class AutoTrajectoryGenerator {
         return TrajectoryUtils.flipIfBlue(alliance, vector2d);
     }
 
+    private double flipIfBlue(double angle) {
+        return TrajectoryUtils.flipIfBlue(alliance, angle);
+    }
     private Pose2d flipIfBluePositive(Pose2d pose2d) {
         return TrajectoryUtils.flipIfBluePositive(alliance, pose2d);
     }
